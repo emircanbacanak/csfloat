@@ -27,8 +27,9 @@ def get_price(item):
 
 def parse_price(price_str):
     try:
-        clean = re.sub(r'[^\d,\.]', '', price_str)
-        clean = clean.replace(',', '.')
+        clean = re.sub(r'[^\d.]', '', price_str)
+        if not clean or clean == '.':
+            return float('inf')
         return float(clean)
     except Exception:
         return float('inf')
