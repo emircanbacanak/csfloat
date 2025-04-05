@@ -3,7 +3,8 @@ from tkinter import messagebox
 import threading
 from queue import Queue
 import time
-from app import search_items
+
+from search import search_items
 
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")
@@ -143,7 +144,3 @@ class App(ctk.CTk):
                 self.log_text.insert("end", message + "\n")
                 self.log_text.yview("end")
         self.after(100, self.process_queue)
-
-if __name__ == "__main__":
-    app = App()
-    app.mainloop()
