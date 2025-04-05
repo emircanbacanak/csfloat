@@ -16,14 +16,17 @@ def safe_get_text(parent, selector):
     try:
         element = parent.find_element(By.CSS_SELECTOR, selector)
         return element.text.strip()
-    except Exception:
+    except Exception as e:
         return "N/A"
 
 def get_price(item):
-    price = safe_get_text(item, ".price span.ng-star-inserted")
-    if price == "N/A":
-        price = safe_get_text(item, "div.price.ng-star-inserted")
-    return price
+    try:
+        price = safe_get_text(item, ".price span.ng-star-inserted")
+        if price == "N/A":
+            price = safe_get_text(item, "div.price.ng-star-inserted")
+        return price
+    except Exception as e:
+        return "N/A"
 
 def parse_price(price_str):
     try:
@@ -31,26 +34,33 @@ def parse_price(price_str):
         if not clean or clean == '.':
             return float('inf')
         return float(clean)
-    except Exception:
+    except Exception as e:
         return float('inf')
 
 def scroll_until_end(driver, max_attempts=100, scroll_pause_time=2):
-    last_item_count = 0
-    no_new_item_count = 0  
-    while no_new_item_count < 2 and max_attempts > 0:
-        driver.execute_script("window.scrollBy(0, 2000);")
-        time.sleep(scroll_pause_time)
-        items = driver.find_elements(By.CSS_SELECTOR, "item-card")
-        current_item_count = len(items)
-        if current_item_count > last_item_count:
-            no_new_item_count = 0 
-        else:
-            no_new_item_count += 1
-        last_item_count = current_item_count
-        max_attempts -= 1
+    try:
+        last_item_count = 0
+        no_new_item_count = 0  
+        while no_new_item_count < 2 and max_attempts > 0:
+            driver.execute_script("window.scrollBy(0, 2000);")
+            time.sleep(scroll_pause_time)
+            items = driver.find_elements(By.CSS_SELECTOR, "item-card")
+            current_item_count = len(items)
+            if current_item_count > last_item_count:
+                no_new_item_count = 0 
+            else:
+                no_new_item_count += 1
+            last_item_count = current_item_count
+            max_attempts -= 1
+    except Exception as e:
+        print(f"Scroll hatası: {str(e)}")
 
 def sanitize_filename(filename):
-    return re.sub(r'[\\/:*?"<>|]', '_', filename)
+    try:
+        return re.sub(r'[\\/:*?"<>|]', '_', filename)
+    except Exception as e:
+        print(f"Dosya adı düzenleme hatası: {str(e)}")
+        return "invalid_filename"
 
 def get_listing_id(driver, item_element, log_queue):
     try:
@@ -66,12 +76,12 @@ def get_listing_id(driver, item_element, log_queue):
             time.sleep(0.5)
             WebDriverWait(driver, 10).until(EC.url_to_be(current_url_before))
             return listing_id, current_url
-
+        return "N/A", "N/A"
     except Exception as e:
-        log_queue.put(f"Listing ID alınırken hata: {str(e)}")
+        log_queue.put(f"Ürün detay sayfasına erişilemedi: {str(e)}")
         try:
             driver.back()
             WebDriverWait(driver, 5).until(EC.url_to_be(current_url_before))
         except:
             pass
-    return "N/A", "N/A"
+        return "N/A", "N/A"

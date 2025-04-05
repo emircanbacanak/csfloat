@@ -19,22 +19,14 @@ if not os.path.exists(PROFILE_PATH):
 
 def complete_purchase(driver, log_queue):
     try:
-        # 1. Adım: Sepet butonuna tıkla ve popup'ın açılmasını bekle
         cart_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.CSS_SELECTOR, "a.hoverable-btn")))
         cart_button.click()
         log_queue.put("Sepet butonuna tıklandı, popup bekleniyor...")
+        time.sleep(1)
         
-        # 2. Adım: Popup'ın tamamen yüklenmesi için bekleyelim
-        time.sleep(3)  # Popup'ın animasyonu için ekstra bekleme
-        
-        # 3. Adım: Tüm sayfayı tarayarak "I agree" kutucuğunu bulmaya çalışalım
         try:
-            # Önce tüm checkbox'ları bulalım
             checkboxes = driver.find_elements(By.TAG_NAME, "mat-checkbox")
-            log_queue.put(f"Bulunan checkbox sayısı: {len(checkboxes)}")
-            
-            # "I agree" text'ini içeren checkbox'ı bulmaya çalışalım
             target_checkbox = None
             for checkbox in checkboxes:
                 try:
@@ -45,25 +37,17 @@ def complete_purchase(driver, log_queue):
                     continue
             
             if target_checkbox:
-                # JavaScript ile tıklama yapalım
                 driver.execute_script("arguments[0].click();", target_checkbox)
-                log_queue.put("'I agree' kutucuğu JavaScript ile tıklandı")
-                
-                # Kontrol edelim
                 checkbox_input = target_checkbox.find_element(By.TAG_NAME, "input")
                 if checkbox_input.is_selected():
                     log_queue.put("'I agree' kutucuğu başarıyla işaretlendi")
                 else:
-                    # Alternatif tıklama yöntemi
                     target_checkbox.click()
-                    log_queue.put("'I agree' kutucuğu normal click ile tıklandı")
             else:
                 log_queue.put("'I agree' text'li checkbox bulunamadı")
                 return False
-            
             time.sleep(1)
             
-            # 4. Adım: Buy Now butonunu bul ve tıkla
             buttons = driver.find_elements(By.TAG_NAME, "button")
             buy_now_button = None
             for button in buttons:
@@ -74,11 +58,27 @@ def complete_purchase(driver, log_queue):
             if buy_now_button:
                 driver.execute_script("arguments[0].scrollIntoView();", buy_now_button)
                 buy_now_button.click()
-                log_queue.put("Buy Now butonuna tıklandı")
+                time.sleep(1)
+                try:
+                    yes_buttons = driver.find_elements(By.TAG_NAME, "button")
+                    yes_button = None
+                    for button in yes_buttons:
+                        if "Yes" in button.text:
+                            yes_button = button
+                            break
+                    
+                    if yes_button:
+                        driver.execute_script("arguments[0].click();", yes_button)
+                        time.sleep(1)
+                    else:
+                        log_queue.put("Yes butonu bulunamadı")
+                        return False
+                except Exception as e:
+                    log_queue.put(f"Yes butonu tıklanırken hata: {str(e)}")
+                    return False
                 
-                # Satın alma işleminin tamamlanmasını bekle
-                log_queue.put("Satın alma işlemi tamamlanıyor, 60 saniye bekleniyor...")
-                time.sleep(60)
+                log_queue.put("Satın alma işlemi tamamlanıyor, 30 saniye bekleniyor...")
+                time.sleep(30)
                 return True
             else:
                 log_queue.put("Buy Now butonu bulunamadı")
@@ -91,6 +91,7 @@ def complete_purchase(driver, log_queue):
     except Exception as e:
         log_queue.put(f"Satın alma işlemi sırasında beklenmeyen hata: {str(e)}")
         return False
+
 def search_items(queries, log_queue):
     grouped_queries = {}
     for q in queries:
@@ -150,8 +151,6 @@ def search_items(queries, log_queue):
         time.sleep(2)
 
         for condition, limit_price in condition_list:
-            log_queue.put(f"{name} | {condition}: Filtreleme yapılıyor (Limit: {limit_price} TL)...")
-            
             try:
                 filter_button = WebDriverWait(driver, 10).until(
                     EC.element_to_be_clickable((By.XPATH, f"//div[@mattooltip='{condition}']")))
@@ -217,7 +216,6 @@ def search_items(queries, log_queue):
                                         }
                                         log_queue.put(f"{name} | {condition}: Sepete eklenebilir ürün bulundu ve sepete eklendi!")
                                         
-                                        # Satın alma işlemini başlat
                                         if complete_purchase(driver, log_queue):
                                             log_queue.put(f"{name} | {condition}: Satın alma işlemi başarıyla tamamlandı!")
                                         else:
@@ -235,9 +233,9 @@ def search_items(queries, log_queue):
                 
                 cheapest_price = parse_price(found_item["Price"])
                 if cheapest_price == limit_price:
-                    result_note = f"Ürün {cheapest_price} TL'den, belirtilen limit fiyat olan {limit_price} TL'den alındı."
+                    result_note = f"Ürün {cheapest_price} USD'den, belirtilen limit fiyat olan {limit_price} USD'den alındı."
                 elif cheapest_price < limit_price:
-                    result_note = f"Ürün {cheapest_price} TL'den, limit fiyatından düşük olduğu için alındı."
+                    result_note = f"Ürün {cheapest_price} USD'den, limit fiyatından düşük olduğu için alındı."
                 
                 record = {
                     "ListingID": found_item["ListingID"],
@@ -253,7 +251,7 @@ def search_items(queries, log_queue):
 
                 key = f"{name}_{condition}"
                 CHEAPEST_ITEMS[key] = record
-                log_queue.put(f"{name} | {condition}: İşlem başarılı! Fiyat: {cheapest_price} TL")
+                log_queue.put(f"{name} | {condition}: İşlem başarılı! Fiyat: {cheapest_price} USD")
                 
                 filename = sanitize_filename(f"cheapest_{name}_{condition}.json")
                 with open(filename, "w", encoding="utf-8") as f:
