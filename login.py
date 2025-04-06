@@ -22,7 +22,6 @@ def login(driver, log_queue):
                     return True
             except Exception:
                 pass
-            time.sleep(1)
         
         log_queue.put("Giriş zaman aşımı")
         return False

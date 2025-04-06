@@ -1,6 +1,15 @@
-2025/04/05-20:08:11.438 2aec Reusing MANIFEST c:\Users\Emir\Desktop\Bionluk\chrome_profile\Default\Session Storage/MANIFEST-000001
-2025/04/05-20:08:11.439 2aec Recovering log #492
-2025/04/05-20:08:11.441 2aec Reusing old log c:\Users\Emir\Desktop\Bionluk\chrome_profile\Default\Session Storage/000492.log 
-2025/04/05-20:08:18.670 42c8 Level-0 table #496: started
-2025/04/05-20:08:18.685 42c8 Level-0 table #496: 769766 bytes OK
-2025/04/05-20:08:18.687 42c8 Delete type=0 #492
+2025/04/06-12:52:09.859 1fa4 Reusing MANIFEST c:\Users\Emir\Desktop\Bionluk\chrome_profile\Default\Session Storage/MANIFEST-000001
+2025/04/06-12:52:09.860 1fa4 Recovering log #27
+2025/04/06-12:52:09.862 1fa4 Reusing old log c:\Users\Emir\Desktop\Bionluk\chrome_profile\Default\Session Storage/000027.log 
+2025/04/06-12:52:16.904 4784 Level-0 table #31: started
+2025/04/06-12:52:16.917 4784 Level-0 table #31: 772389 bytes OK
+2025/04/06-12:52:16.918 4784 Delete type=0 #27
+2025/04/06-12:52:16.919 4784 Compacting 4@0 + 1@1 files
+2025/04/06-12:52:16.943 4784 Generated table #32@0: 291 keys, 774395 bytes
+2025/04/06-12:52:16.943 4784 Compacted 4@0 + 1@1 files => 774395 bytes
+2025/04/06-12:52:16.944 4784 compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/04/06-12:52:16.945 4784 Delete type=2 #20
+2025/04/06-12:52:16.945 4784 Delete type=2 #22
+2025/04/06-12:52:16.945 4784 Delete type=2 #25
+2025/04/06-12:52:16.945 4784 Delete type=2 #28
+2025/04/06-12:52:16.945 4784 Delete type=2 #31

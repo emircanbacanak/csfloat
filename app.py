@@ -1,4 +1,5 @@
 import re
+import json
 from queue import Queue
 import time
 import os
@@ -10,13 +11,34 @@ PROFILE_PATH = os.path.join(os.getcwd(), "chrome_profile")
 if not os.path.exists(PROFILE_PATH):
     os.makedirs(PROFILE_PATH)
 
+PURCHASED_ITEMS_FILE = os.path.join(os.getcwd(), "purchased_items.json")
+PURCHASED_ITEMS = {}
 CHEAPEST_ITEMS = {}
+
+def load_purchased_items():
+    global PURCHASED_ITEMS
+    try:
+        if os.path.exists(PURCHASED_ITEMS_FILE):
+            with open(PURCHASED_ITEMS_FILE, 'r', encoding='utf-8') as f:
+                PURCHASED_ITEMS = json.load(f)
+    except:
+        pass
+
+def save_purchased_item(item_data):
+    try:
+        PURCHASED_ITEMS[item_data['ListingID']] = item_data
+        with open(PURCHASED_ITEMS_FILE, 'w', encoding='utf-8') as f:
+            json.dump(PURCHASED_ITEMS, f, ensure_ascii=False, indent=4)
+    except:
+        pass
+
+load_purchased_items()
 
 def safe_get_text(parent, selector):
     try:
         element = parent.find_element(By.CSS_SELECTOR, selector)
         return element.text.strip()
-    except Exception as e:
+    except:
         return "N/A"
 
 def get_price(item):
@@ -25,7 +47,7 @@ def get_price(item):
         if price == "N/A":
             price = safe_get_text(item, "div.price.ng-star-inserted")
         return price
-    except Exception as e:
+    except:
         return "N/A"
 
 def parse_price(price_str):
@@ -34,7 +56,7 @@ def parse_price(price_str):
         if not clean or clean == '.':
             return float('inf')
         return float(clean)
-    except Exception as e:
+    except:
         return float('inf')
 
 def scroll_until_end(driver, max_attempts=100, scroll_pause_time=2):
@@ -52,14 +74,13 @@ def scroll_until_end(driver, max_attempts=100, scroll_pause_time=2):
                 no_new_item_count += 1
             last_item_count = current_item_count
             max_attempts -= 1
-    except Exception as e:
-        print(f"Scroll hatası: {str(e)}")
+    except:
+        pass
 
 def sanitize_filename(filename):
     try:
         return re.sub(r'[\\/:*?"<>|]', '_', filename)
-    except Exception as e:
-        print(f"Dosya adı düzenleme hatası: {str(e)}")
+    except:
         return "invalid_filename"
 
 def get_listing_id(driver, item_element, log_queue):
@@ -77,8 +98,7 @@ def get_listing_id(driver, item_element, log_queue):
             WebDriverWait(driver, 10).until(EC.url_to_be(current_url_before))
             return listing_id, current_url
         return "N/A", "N/A"
-    except Exception as e:
-        log_queue.put(f"Ürün detay sayfasına erişilemedi: {str(e)}")
+    except:
         try:
             driver.back()
             WebDriverWait(driver, 5).until(EC.url_to_be(current_url_before))

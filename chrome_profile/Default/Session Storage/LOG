@@ -1,6 +1,6 @@
-2025/04/05-20:12:44.867 1714 Reusing MANIFEST c:\Users\Emir\Desktop\Bionluk\chrome_profile\Default\Session Storage/MANIFEST-000001
-2025/04/05-20:12:44.868 1714 Recovering log #495
-2025/04/05-20:12:44.870 1714 Reusing old log c:\Users\Emir\Desktop\Bionluk\chrome_profile\Default\Session Storage/000495.log 
-2025/04/05-20:12:52.093 1e20 Level-0 table #499: started
-2025/04/05-20:12:52.107 1e20 Level-0 table #499: 771318 bytes OK
-2025/04/05-20:12:52.109 1e20 Delete type=0 #495
+2025/04/06-13:00:11.199 38dc Reusing MANIFEST c:\Users\Emir\Desktop\Bionluk\chrome_profile\Default\Session Storage/MANIFEST-000001
+2025/04/06-13:00:11.200 38dc Recovering log #30
+2025/04/06-13:00:11.202 38dc Reusing old log c:\Users\Emir\Desktop\Bionluk\chrome_profile\Default\Session Storage/000030.log 
+2025/04/06-13:00:17.849 2f68 Level-0 table #35: started
+2025/04/06-13:00:17.864 2f68 Level-0 table #35: 771946 bytes OK
+2025/04/06-13:00:17.866 2f68 Delete type=0 #30
